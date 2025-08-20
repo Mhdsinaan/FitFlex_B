@@ -23,6 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\FitFlex.Application\FitFlex.Application.csproj" />
     <ProjectReference Include="..\FitFlex.Infrastructure\FitFlex.Infrastructure.csproj" />
   </ItemGroup>
 
