@@ -11,7 +11,7 @@ namespace FitFlex.Application.DTO_s.User_dto
     {
         public string UserName { get; set; }
         public string Email { get; set; }
-        public UserRole role { get; set; }
+        public string Role { get; set; }
 
         public string Token { get; set; }
     }
