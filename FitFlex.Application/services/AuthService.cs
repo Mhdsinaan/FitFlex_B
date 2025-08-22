@@ -70,8 +70,8 @@ namespace FitFlex.Application.services
                 UserName = dto.UserName,
                 Email = dto.Email,
                 Password = dto.Password,
-                created = dto.created,
                 Role = UserRole.user
+                
 
             };
             await repo.AddUserAsync(user);
