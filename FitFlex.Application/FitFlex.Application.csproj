@@ -21,6 +21,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\FitFlex.Domain\FitFlex.Domain.csproj" />
+    <ProjectReference Include="..\FitFlex.Infrastructure\FitFlex.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,8 +1,12 @@
 ﻿using System;
+using System.IO;
 using System.Threading.Tasks;
+using FitFlex.Application.DTO_s.Trainers_dto;
 using FitFlex.Application.DTO_s.User_dto;
 using FitFlex.Application.Interfaces;
 using FitFlex.CommenAPi;
+using FitFlex.Domain.Entities.Users_Model;
+using FitFlex.Infrastructure.Migrations;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FitFlex.Controllers
@@ -17,12 +21,13 @@ namespace FitFlex.Controllers
             _Auth = auth;
         }
 
-        [HttpPost]
+        [HttpPost("userREgistration")]
         public async Task<IActionResult> Registration([FromBody] RegisterDto dto)
         {
             try
             {
-                var exist = await _Auth.GetByUSer(dto.Email);
+                var user = await _Auth.GetAllAsync();
+                var exist = user.FirstOrDefault(p => p.Email == dto.Email);
 
                 if (exist != null)
                 {
@@ -41,6 +46,31 @@ namespace FitFlex.Controllers
                 return StatusCode(500, new APiResponds<string>("500", "Internal server error", ex.Message));
             }
         }
+        [HttpPost("Trainer Registration")]
+        public async Task<IActionResult> Regi([FromBody] TrainerRegisterDto dto)
+        {
+            try
+            {
+                var trainers = await _Auth.GetAllAsync();
+                var exist = trainers.FirstOrDefault(p => p.Email == dto.Email);
+
+                if (exist != null)
+                {
+                    return Conflict(new APiResponds<string>("409", "trainer already exists", null));
+                }
+
+                var register = await _Auth.TrainerRegistration(dto);
+                if (register == null)
+                    return BadRequest(new APiResponds<string>("400", "Registration failed", null));
+
+                return Ok(new APiResponds<string>("200", "Registration successful", null));
+            }
+            catch (Exception ex)
+            {
+
+                return StatusCode(500, new APiResponds<string>("500", "Internal server error", ex.Message));
+            }
+        }
 
         [HttpPost("login")]
         public async Task<IActionResult> LOGIN([FromBody] LoginDto dto)
@@ -56,6 +86,21 @@ namespace FitFlex.Controllers
             catch (Exception ex)
             {
                
+                return StatusCode(500, new APiResponds<string>("500", "Internal server error", ex.Message));
+            }
+        }
+        [HttpGet]
+        public async Task<IActionResult> UserByID(int id)
+        {
+            try
+            {
+                var user = await _Auth.GetByUSer(id);
+                if (user is null) return NotFound(new APiResponds<string>("404", "no user found", null));
+                return Ok(new APiResponds<UserResponseDto>("200", "userdeatils", user));
+
+            }
+            catch (Exception ex)
+            {
                 return StatusCode(500, new APiResponds<string>("500", "Internal server error", ex.Message));
             }
         }

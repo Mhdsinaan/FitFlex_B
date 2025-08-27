@@ -1,6 +1,4 @@
 ﻿using FitFlex.Application.Interfaces;
-using FitFlex.Application.Repository_interface;
-using FitFlex.Application.services;
 using FitFlex.Infrastructure.Db_context;
 using FitFlex.Infrastructure.Repository_service;
 using Microsoft.EntityFrameworkCore;
@@ -10,6 +8,10 @@ using System.Text;
 using FitFlex.Application.DTO_s.Dto_validation;
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using FitFlex.Application.DTOs.Dto_validation;
+using FitFlex.Application.DTO_s.Trainers_dto;
+using FitFlex.Infrastructure.Interfaces;
+using FitFlex.Application.services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -48,12 +50,14 @@ builder.Services.AddDbContext<MyContext>(options =>
 //validation
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddValidatorsFromAssemblyContaining<RegisterdtoValidation>();
+builder.Services.AddValidatorsFromAssemblyContaining<TrainersValidation>();
+builder.Services.AddValidatorsFromAssemblyContaining<TrainerRegisterDtoValidation>();
+builder.Services.AddValidatorsFromAssemblyContaining<TrainerLoginDtoValidation>();
 
 
 
 
-// DI for services
-builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped(typeof(IRepository<>), typeof(repository<>));
 builder.Services.AddScoped<IAuth, AuthService>();
 
 // Swagger

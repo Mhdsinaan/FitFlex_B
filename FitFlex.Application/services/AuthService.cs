@@ -5,11 +5,14 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using FitFlex.Application.DTO_s.Trainers_dto;
 using FitFlex.Application.DTO_s.User_dto;
 using FitFlex.Application.Interfaces;
-using FitFlex.Application.Repository_interface;
+using FitFlex.Domain.Entities.Trainer_model;
 using FitFlex.Domain.Entities.Users_Model;
 using FitFlex.Domain.Enum;
+using FitFlex.Infrastructure.Interfaces;
+using FitFlex.Infrastructure.Migrations;
 using Microsoft.IdentityModel.Tokens;
 
 
@@ -17,34 +20,64 @@ namespace FitFlex.Application.services
 {
     public class AuthService : IAuth
     {
-        private readonly IUserRepository repo;
-        public AuthService(IUserRepository auth)
+        private readonly IRepository<User> _userRepo;
+        private readonly IRepository<Trainer> _trainerRepo;
+        public AuthService(IRepository<User> auth, IRepository<Trainer> Trainer)
         {
-            repo = auth;
+            _userRepo = auth;
+            _trainerRepo = Trainer;
         }
 
-        public async Task<User> GetByUSer( string Email)
+        
+
+        public async Task<UserResponseDto> GetByUSer(int id)
         {
-            var user = await repo.AllUsers();
-            var logindata = user.FirstOrDefault(p => p.Email == Email);
+            var user = await _userRepo.GetByIdAsync(id);
 
-            if (logindata is null) return null;
-            var byid = new User
+            if (user is null)
+                return null;
+
+            var dto = new UserResponseDto
             {
-                UserID = logindata.UserID,
-                UserName = logindata.UserName,
-                Email = logindata.Email,
-                Role = logindata.Role
+                Id = user.ID,
+                UserName = user.UserName,
+                Email = user.Email,
+                Role = user.Role.ToString()
             };
-            
-            return byid;
 
+            return dto;
+        }
+
+
+        public async Task<List<UserResponseDto>> GetAllAsync()
+        {
+            var users = await _userRepo.GetAllAsync();
+            if (users == null || !users.Any())
+
+                return new List<UserResponseDto>();
+            var userDtos = users.Select(u => new UserResponseDto
+            {
+                Id = u.ID,
+                UserName = u.UserName,
+                Email = u.Email,
+                Role = u.Role.ToString()
+            }).ToList();
+
+            return userDtos;
+        }
+
+        public async Task<Trainer> GetTrainerByID(int id)
+        {
+
+            var trainer = await _trainerRepo.GetByIdAsync(id);
+            if (trainer is null) return null;
+            return trainer;
         }
 
         public async Task<LoginResponseDto> Login(LoginDto dto)
         {
-            var users = await repo.AllUsers();
-            var loginData = users.FirstOrDefault(p => p.Email == dto.Email);
+            var users = await _userRepo.GetAllAsync();
+            var loginData = users.FirstOrDefault(p => p.Email == dto.Email && p.Password == dto.Password);
             if (loginData is null) return null;
 
             var token = createToken(loginData);
@@ -59,25 +92,68 @@ namespace FitFlex.Application.services
 
 
 
-        }   
+        }
 
         public async Task<string> Register(RegisterDto dto)
         {
-            var exist = await repo.AllUsers();
-            if (exist.Any(o => o.Email == dto.Email))return "user already exist";
+            var exist = await _userRepo.GetAllAsync();
+            if (exist.Any(o => o.Email == dto.Email)) return "user already exist";
             var user = new User
             {
                 UserName = dto.UserName,
                 Email = dto.Email,
                 Password = dto.Password,
-                Role = UserRole.user
+                Role = UserRole.user,
                 
 
             };
-            await repo.AddUserAsync(user);
-            await repo.SaveChangesAsync();
-            return "registration sucess";
+            await _userRepo.AddAsync(user);
+            await _userRepo.SaveChangesAsync();
+            return "registration success";
         }
+
+        public async Task<string> TrainerRegistration(TrainerRegisterDto dto)
+        {
+          
+            var trainer = (await _userRepo.GetAllAsync())
+                            .FirstOrDefault(p => p.Email == dto.Email);
+
+            if (trainer != null)
+            {
+                return "trainer already exists";
+            }
+
+            var newUSER = new User
+            {
+                UserName = dto.FullName,
+                Email = dto.Email,
+                Password = dto.Password, 
+                Role = UserRole.Trainer
+            };
+
+            await _userRepo.AddAsync(newUSER);
+            await _userRepo.SaveChangesAsync();
+
+           
+            var newTrainer = new Trainer()
+            {
+                FullName = dto.FullName,
+                ExperienceYears = dto.ExperienceYears,
+                Email = dto.Email,
+                Gender = dto.Gender,
+                PhoneNumber = dto.PhoneNumber,
+                Salary = dto.Salary,
+               
+                UserId = newUSER.ID
+            };
+
+            await _trainerRepo.AddAsync(newTrainer);
+            await _trainerRepo.SaveChangesAsync();
+
+            return "new trainer created successfully";
+        }
+
+
 
         private string createToken(User user)
         {
@@ -88,7 +164,7 @@ namespace FitFlex.Application.services
                 Subject = new ClaimsIdentity(new Claim[]
                 {
                     new Claim(ClaimTypes.Name, user.UserName),
-                    new Claim(ClaimTypes.NameIdentifier, user.UserID.ToString()),
+                    new Claim(ClaimTypes.NameIdentifier, user.ID.ToString()),
                     new Claim(ClaimTypes.Role, user.Role.ToString()),
                 }),
                 Expires = DateTime.UtcNow.AddDays(1),
@@ -96,17 +172,15 @@ namespace FitFlex.Application.services
                 Issuer = "MyApp",
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key),
                 SecurityAlgorithms.HmacSha256Signature)
-                
+
 
             };
             var token = TokenHandler.CreateToken(tokenDescriptor);
-                return TokenHandler.WriteToken(token);
+            return TokenHandler.WriteToken(token);
 
         }
-    
 
-
-
+        
     }
 
 }
