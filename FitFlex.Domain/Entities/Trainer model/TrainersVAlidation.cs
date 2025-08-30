@@ -48,9 +48,7 @@ namespace FitFlex.Application.DTOs.Dto_validation
            
 
            
-            RuleFor(t => t.Salary)
-                .GreaterThanOrEqualTo(0)
-                .WithMessage("Salary must be positive");
+            
 
 
             RuleFor(t => t.Status)

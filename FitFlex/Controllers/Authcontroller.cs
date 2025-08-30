@@ -7,7 +7,9 @@ using FitFlex.Application.Interfaces;
 using FitFlex.CommenAPi;
 using FitFlex.Domain.Entities.Users_Model;
 using FitFlex.Infrastructure.Migrations;
+using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Mvc;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace FitFlex.Controllers
 {
@@ -16,9 +18,11 @@ namespace FitFlex.Controllers
     public class Authcontroller : ControllerBase
     {
         private readonly IAuth _Auth;
-        public Authcontroller(IAuth auth)
+        private readonly ITrainerservice _Trainerauth;
+        public Authcontroller(IAuth auth, ITrainerservice Trainerauth)
         {
             _Auth = auth;
+            _Trainerauth = Trainerauth;
         }
 
         [HttpPost("userREgistration")]
@@ -89,7 +93,7 @@ namespace FitFlex.Controllers
                 return StatusCode(500, new APiResponds<string>("500", "Internal server error", ex.Message));
             }
         }
-        [HttpGet]
+        [HttpGet("byUserId")]
         public async Task<IActionResult> UserByID(int id)
         {
             try
@@ -104,5 +108,20 @@ namespace FitFlex.Controllers
                 return StatusCode(500, new APiResponds<string>("500", "Internal server error", ex.Message));
             }
         }
+        [HttpGet("ByTrainerId")]
+        public async Task<IActionResult> TrainerById(int trainerID)
+        {
+            try
+            {
+                var user = await _Trainerauth.GetTrainerByIdAsync(trainerID);
+                if (user is null) return NotFound(new APiResponds<string>("404", "Trainer Notfount", null));
+                return Ok(new APiResponds<TrainerResponseDto>("200", "Trainer Details", user));
+            }catch (Exception ex)
+            {
+                return StatusCode(500, new APiResponds<string>("500", "Internal server error", ex.Message));
+            }
+
+        }
+       
     }
 }

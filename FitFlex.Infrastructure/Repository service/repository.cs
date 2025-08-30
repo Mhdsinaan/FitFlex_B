@@ -30,9 +30,9 @@ namespace FitFlex.Infrastructure.Repository_service
             _dbset.Remove(entity);
         }
 
-        public async Task<List<User>> GetAllAsync()
+        public async Task<List<T>> GetAllAsync()
         {
-            return await _myContext.Users.ToListAsync();
+            return await _dbset.ToListAsync();
 
         }
 

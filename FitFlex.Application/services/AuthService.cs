@@ -4,7 +4,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
-using System.Threading.Tasks;
+using System.Threading.Tasks; 
 using FitFlex.Application.DTO_s.Trainers_dto;
 using FitFlex.Application.DTO_s.User_dto;
 using FitFlex.Application.Interfaces;
@@ -96,6 +96,7 @@ namespace FitFlex.Application.services
 
         public async Task<string> Register(RegisterDto dto)
         {
+            
             var exist = await _userRepo.GetAllAsync();
             if (exist.Any(o => o.Email == dto.Email)) return "user already exist";
             var user = new User
@@ -105,6 +106,7 @@ namespace FitFlex.Application.services
                 Password = dto.Password,
                 Role = UserRole.user,
                 
+
 
             };
             await _userRepo.AddAsync(user);
@@ -142,7 +144,7 @@ namespace FitFlex.Application.services
                 Email = dto.Email,
                 Gender = dto.Gender,
                 PhoneNumber = dto.PhoneNumber,
-                Salary = dto.Salary,
+               
                
                 UserId = newUSER.ID
             };

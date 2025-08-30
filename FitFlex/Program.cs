@@ -12,6 +12,7 @@ using FitFlex.Application.DTOs.Dto_validation;
 using FitFlex.Application.DTO_s.Trainers_dto;
 using FitFlex.Infrastructure.Interfaces;
 using FitFlex.Application.services;
+using FitFlex.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -59,12 +60,15 @@ builder.Services.AddValidatorsFromAssemblyContaining<TrainerLoginDtoValidation>(
 
 builder.Services.AddScoped(typeof(IRepository<>), typeof(repository<>));
 builder.Services.AddScoped<IAuth, AuthService>();
+builder.Services.AddScoped<ITrainerservice, TrainerService>();
 
 // Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+
+app.UseMiddleware<UserIdMiddleware>();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

@@ -51,14 +51,7 @@ namespace FitFlex.Application.DTO_s.Dto_validation
                 .GreaterThanOrEqualTo(0)
                 .WithMessage("Experience cannot be negative");
 
-            RuleFor(t => t.Salary)
-                .GreaterThanOrEqualTo(0)
-                .WithMessage("Salary must be positive");
-
-            RuleFor(t => t.Status)
-                .NotEmpty().WithMessage("Status is required")
-                .Must(s => s == "Active" || s == "Inactive")
-                .WithMessage("Status must be Active or Inactive");
+          
                
         }
     }
