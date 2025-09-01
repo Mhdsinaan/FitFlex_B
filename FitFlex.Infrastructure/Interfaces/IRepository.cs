@@ -12,7 +12,7 @@ namespace FitFlex.Infrastructure.Interfaces
         Task<T> GetByIdAsync(int id);
         Task<List<T>> GetAllAsync();
         Task AddAsync(T entity);
-        void Update(T entity);
+         void Update(T entity);
         void Delete(T entity);
         Task<int> SaveChangesAsync();
 

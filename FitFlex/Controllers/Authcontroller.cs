@@ -5,6 +5,7 @@ using FitFlex.Application.DTO_s.Trainers_dto;
 using FitFlex.Application.DTO_s.User_dto;
 using FitFlex.Application.Interfaces;
 using FitFlex.CommenAPi;
+using FitFlex.Domain.Entities.Trainer_model;
 using FitFlex.Domain.Entities.Users_Model;
 using FitFlex.Infrastructure.Migrations;
 using Microsoft.AspNetCore.Hosting.Server;
@@ -122,6 +123,29 @@ namespace FitFlex.Controllers
             }
 
         }
-       
+        [HttpDelete("deleteTrainer/{id}")]
+        public async Task<IActionResult> DeleteTrainer(int id)
+        {
+            try
+            {
+                var trainer = await _Trainerauth.DeleteTrainerAsync(id);
+
+                if (trainer == null)
+                    return NotFound(new APiResponds<string>("404", $"Trainer with Id {id} not found", null));
+
+               
+                
+
+                return Ok(new APiResponds<TrainerResponseDto>("200", "Trainer deleted successfully", null));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new APiResponds<string>("500", "Internal server error", ex.Message));
+            }
+        }
+
+
+
+
     }
 }

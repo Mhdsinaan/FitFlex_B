@@ -21,8 +21,9 @@ namespace FitFlex.Application.Interfaces
 
 
         Task<List<UserResponseDto>> GetAllAsync();
-        Task<Trainer> GetTrainerByID(int id);
-        
+        Task<TrainerResponseDto> GetTrainerByID(int id);
+
+
 
     }
 }

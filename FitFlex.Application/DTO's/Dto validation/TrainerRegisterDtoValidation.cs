@@ -41,10 +41,7 @@ namespace FitFlex.Application.DTO_s.Dto_validation
                 .WithMessage("Gender must be Male, Female, or Other");
                 
 
-            RuleFor(t => t.Specialization)
-                .NotEmpty().WithMessage("Specialization is required")
-                .MaximumLength(100)
-                .WithMessage("Specialization cannot exceed 100 characters");
+          
                 
 
             RuleFor(t => t.ExperienceYears)

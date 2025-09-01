@@ -66,12 +66,20 @@ namespace FitFlex.Application.services
             return userDtos;
         }
 
-        public async Task<Trainer> GetTrainerByID(int id)
+        public async Task<TrainerResponseDto> GetTrainerByID(int id)
         {
-
             var trainer = await _trainerRepo.GetByIdAsync(id);
             if (trainer is null) return null;
-            return trainer;
+
+            return new TrainerResponseDto
+            {
+                Id = trainer.Id,
+                FullName = trainer.FullName,
+                PhoneNumber = trainer.PhoneNumber,
+                Gender = trainer.Gender,
+                
+                ExperienceYears = trainer.ExperienceYears
+            };
         }
 
         public async Task<LoginResponseDto> Login(LoginDto dto)
@@ -144,6 +152,7 @@ namespace FitFlex.Application.services
                 Email = dto.Email,
                 Gender = dto.Gender,
                 PhoneNumber = dto.PhoneNumber,
+                
                
                
                 UserId = newUSER.ID

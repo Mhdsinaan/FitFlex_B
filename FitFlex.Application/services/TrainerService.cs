@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using FitFlex.Application.DTO_s.Trainers_dto;
 using FitFlex.Application.Interfaces;
 using FitFlex.Domain.Entities.Trainer_model;
+using FitFlex.Domain.Entities.Users_Model;
 using FitFlex.Infrastructure.Interfaces;
 
 namespace FitFlex.Application.services
@@ -13,19 +14,31 @@ namespace FitFlex.Application.services
     public class TrainerService : ITrainerservice
     {
         private readonly IRepository<Trainer> _trainerRepo;
-        public TrainerService(IRepository<Trainer> trainerrepo)
+        private readonly IRepository<User> _UserRepo;
+        public TrainerService(IRepository<Trainer> trainerrepo, IRepository<User> UserRepo)
         {
             _trainerRepo = trainerrepo;
+            _UserRepo = UserRepo;
         }
 
-        public async Task<bool> DeleteTrainerAsync(int trainerID)
+        public async Task<User?> DeleteTrainerAsync(int trainerId)
         {
-            var user = await _trainerRepo.GetByIdAsync(trainerID);
-            if (user is null) return false;
-            _trainerRepo.Delete(user);
-            return true;
-            
+            var trainer = await _trainerRepo.GetByIdAsync(trainerId);
+            if (trainer == null) return null;
+
+            var user = await _UserRepo.GetByIdAsync(trainer.UserId);
+            if (user == null) return null;
+
+            _UserRepo.Delete(user);
+
+            await _UserRepo.SaveChangesAsync();
+
+            return user;
         }
+
+
+
+
 
         public async Task<List<TrainerResponseDto>> GetAllTrainersAsync()
         {
@@ -62,15 +75,35 @@ namespace FitFlex.Application.services
                 Email = user.Email,
                 FullName = user.FullName,
                 Gender = user.Gender,
-                PhoneNumber = user.PhoneNumber
+                PhoneNumber = user.PhoneNumber,
+                ExperienceYears = user.ExperienceYears,
+                Status = user.Status
 
 
             };
         }
 
-        public Task<bool> UpdateTrainerAsync(int trainerId, TrainerUpdateDto dto)
+        public async Task<bool> UpdateTrainerAsync(int trainerId, TrainerUpdateDto dto)
         {
-            throw new NotImplementedException();
+          
+            var trainer = await _trainerRepo.GetByIdAsync(trainerId);
+            if (trainer == null)
+            {
+                return false; 
+            }
+
+            
+            trainer.FullName = dto.FullName;
+            trainer.PhoneNumber = dto.PhoneNumber;
+            trainer.Gender = dto.Gender;
+            trainer.ExperienceYears = dto.ExperienceYears;
+
+           
+             _trainerRepo.Update(trainer);
+            await _trainerRepo.SaveChangesAsync();
+
+            return true;
         }
+
     }
 }
