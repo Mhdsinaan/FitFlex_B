@@ -61,6 +61,8 @@ builder.Services.AddValidatorsFromAssemblyContaining<TrainerLoginDtoValidation>(
 builder.Services.AddScoped(typeof(IRepository<>), typeof(repository<>));
 builder.Services.AddScoped<IAuth, AuthService>();
 builder.Services.AddScoped<ITrainerservice, TrainerService>();
+builder.Services.AddScoped<ISubscription, SubscriptionService>();
+
 
 // Swagger
 builder.Services.AddEndpointsApiExplorer();
