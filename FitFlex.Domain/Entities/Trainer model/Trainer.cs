@@ -14,7 +14,8 @@ namespace FitFlex.Domain.Entities.Trainer_model
         [Key]
         public int Id { get; set; }
         public int UserId { get; set; }
-        public string FullName { get; set; }         
+        public string FullName { get; set; }
+        public bool IsDelete { get; set; } = false;
         public string Email { get; set; }             
         public string PhoneNumber { get; set; }           
         public string Gender { get; set; }          

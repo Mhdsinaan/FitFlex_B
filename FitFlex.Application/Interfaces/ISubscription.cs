@@ -1,4 +1,5 @@
-﻿using FitFlex.Domain.Entities.Subscription_model;
+﻿using FitFlex.Application.DTO_s.subscriptionDto;
+using FitFlex.Domain.Entities.Subscription_model;
 using FitFlex.Infrastructure.Interfaces;
 
 namespace FitFlex.Application.Interfaces
@@ -10,10 +11,11 @@ namespace FitFlex.Application.Interfaces
 
         Task<SubscriptionPlan?> GetPlanByIdAsync(int id);
 
-      
-        Task<SubscriptionPlan> CreatePlanAsync(SubscriptionPlan plan);
 
-       
+        Task<SubscriptionPlansResponseDto> CreatePlanAsync(SubscriptionPlanDto plan);
+
+
+
         Task<SubscriptionPlan?> UpdatePlanAsync(int id, SubscriptionPlan plan);
 
 

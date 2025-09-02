@@ -17,6 +17,7 @@ namespace FitFlex.Domain.Entities.Users_Model
         public string Email { get; set; }
         public string Password { get; set; }
         public UserRole Role { get; set; }
+        //public bool IsDelete { get; set; } = false;
 
         //public Trainers Trainer { get; set; }
 

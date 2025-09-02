@@ -21,20 +21,57 @@ namespace FitFlex.Application.services
             _UserRepo = UserRepo;
         }
 
-        public async Task<User?> DeleteTrainerAsync(int trainerId)
+        public async Task<User?> DeleteTrainerAsync(int trainerId, int currentUserId)
         {
+           
             var trainer = await _trainerRepo.GetByIdAsync(trainerId);
-            if (trainer == null) return null;
+            if (trainer == null)
+            {
+              
+                return null;
+            }
 
+           
+            if (trainer.UserId == 0)
+            {
+               
+                return null;
+            }
+
+           
             var user = await _UserRepo.GetByIdAsync(trainer.UserId);
-            if (user == null) return null;
+            if (user == null)
+            {
+               
+                return null;
+            }
 
+           
+            if (trainer.IsDelete == true)
+            {
+                return null;
+            }
+
+           
+            trainer.DeletedBy = currentUserId;
+            trainer.DeletedOn = DateTime.UtcNow;
+            trainer.IsDelete = true;
+            user.IsDelete = true;
+
+            _trainerRepo.Update(trainer);
+
+           
             _UserRepo.Delete(user);
 
+          
+            await _trainerRepo.SaveChangesAsync();
             await _UserRepo.SaveChangesAsync();
 
             return user;
         }
+
+
+
 
 
 
@@ -55,6 +92,7 @@ namespace FitFlex.Application.services
                 PhoneNumber = t.PhoneNumber,
                 Gender = t.Gender,
                 ExperienceYears=t.ExperienceYears,
+
               
                 CreatedOn = t.CreatedOn,
                 
@@ -69,7 +107,9 @@ namespace FitFlex.Application.services
         {
             var user = await _trainerRepo.GetByIdAsync(trainerId);
             if (user is null) return null;
-            return new TrainerResponseDto()
+            if (user.IsDelete == false)
+            {
+                return new TrainerResponseDto()
             {
                 Id = user.Id,
                 Email = user.Email,
@@ -78,9 +118,12 @@ namespace FitFlex.Application.services
                 PhoneNumber = user.PhoneNumber,
                 ExperienceYears = user.ExperienceYears,
                 Status = user.Status
+                
 
 
             };
+            }
+            return null;
         }
 
         public async Task<bool> UpdateTrainerAsync(int trainerId, TrainerUpdateDto dto)

@@ -8,7 +8,7 @@ namespace FitFlex.Application.DTO_s.subscriptionDto
 {
     public class SubscriptionPlanDto
     {
-        public int Id { get; set; }
+       
         public string Name { get; set; }
         public string Description { get; set; }
         public decimal Price { get; set; }
@@ -24,6 +24,14 @@ namespace FitFlex.Application.DTO_s.subscriptionDto
 
     public class UpdateSubscriptionPlanDto
     {
+        public string Name { get; set; }
+        public string Description { get; set; }
+        public decimal Price { get; set; }
+        public int DurationInDays { get; set; }
+    }
+    public class SubscriptionPlansResponseDto
+    {
+        public int Id { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
         public decimal Price { get; set; }

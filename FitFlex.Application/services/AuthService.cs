@@ -33,9 +33,12 @@ namespace FitFlex.Application.services
         public async Task<UserResponseDto> GetByUSer(int id)
         {
             var user = await _userRepo.GetByIdAsync(id);
+            
+
 
             if (user is null)
                 return null;
+            if (user.IsDelete) return null;
 
             var dto = new UserResponseDto
             {
@@ -69,6 +72,7 @@ namespace FitFlex.Application.services
         public async Task<TrainerResponseDto> GetTrainerByID(int id)
         {
             var trainer = await _trainerRepo.GetByIdAsync(id);
+            if (trainer.IsDelete) return null;
             if (trainer is null) return null;
 
             return new TrainerResponseDto
@@ -85,7 +89,7 @@ namespace FitFlex.Application.services
         public async Task<LoginResponseDto> Login(LoginDto dto)
         {
             var users = await _userRepo.GetAllAsync();
-            var loginData = users.FirstOrDefault(p => p.Email == dto.Email && p.Password == dto.Password);
+            var loginData = users.FirstOrDefault(p => p.Email == dto.Email && p.Password == dto.Password && p.IsDelete==false);
             if (loginData is null) return null;
 
             var token = createToken(loginData);
@@ -113,6 +117,7 @@ namespace FitFlex.Application.services
                 Email = dto.Email,
                 Password = dto.Password,
                 Role = UserRole.user,
+                  
                 
 
 

@@ -1,4 +1,5 @@
-﻿using FitFlex.Application.Interfaces;
+﻿using FitFlex.Application.DTO_s.subscriptionDto;
+using FitFlex.Application.Interfaces;
 using FitFlex.CommenAPi;
 using FitFlex.Domain.Entities.Subscription_model;
 using Microsoft.AspNetCore.Authorization;
@@ -18,7 +19,7 @@ namespace FitFlex.API.Controllers.Admin
             _subscriptionService = subscriptionService;
         }
 
-        // GET: api/admin/plans
+        
         [HttpGet]
         public async Task<IActionResult> GetAllPlans()
         {
@@ -26,7 +27,7 @@ namespace FitFlex.API.Controllers.Admin
             return Ok(new APiResponds<IEnumerable<SubscriptionPlan>>("200", "Plans fetched successfully", plans));
         }
 
-        // GET: api/admin/plans/{id}
+       
         [HttpGet("{id}")]
         public async Task<IActionResult> GetPlanById(int id)
         {
@@ -37,18 +38,17 @@ namespace FitFlex.API.Controllers.Admin
             return Ok(new APiResponds<SubscriptionPlan>("200", "Plan fetched successfully", plan));
         }
 
-        // POST: api/admin/plans
         [HttpPost]
-        public async Task<IActionResult> CreatePlan([FromBody] SubscriptionPlan plan)
+        public async Task<IActionResult> CreatePlan([FromBody] SubscriptionPlanDto plan)
         {
             var createdPlan = await _subscriptionService.CreatePlanAsync(plan);
             if (createdPlan == null)
                 return Conflict(new APiResponds<string>("409", "Plan with the same name already exists", null));
 
-            return Ok(new APiResponds<SubscriptionPlan>("200", "Plan created successfully", createdPlan));
+            return Ok(new APiResponds<SubscriptionPlansResponseDto>("200", "Plan created successfully", createdPlan));
         }
 
-        // PUT: api/admin/plans/{id}
+
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdatePlan(int id, [FromBody] SubscriptionPlan plan)
         {
@@ -59,7 +59,7 @@ namespace FitFlex.API.Controllers.Admin
             return Ok(new APiResponds <SubscriptionPlan>("200", "Plan updated successfully", updatedPlan));
         }
 
-        // DELETE: api/admin/plans/{id}
+      
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeletePlan(int id)
         {

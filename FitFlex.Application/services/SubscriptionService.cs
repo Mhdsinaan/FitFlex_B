@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using FitFlex.Application.DTO_s.subscriptionDto;
 using FitFlex.Application.Interfaces;
 using FitFlex.Domain.Entities.Subscription_model;
 using FitFlex.Infrastructure.Interfaces;
@@ -16,30 +17,40 @@ namespace FitFlex.Application.services
         {
             _subscription = subscription;
         }
-        public async Task<SubscriptionPlan?> CreatePlanAsync(SubscriptionPlan plan)
+        public async Task<SubscriptionPlansResponseDto?> CreatePlanAsync(SubscriptionPlanDto plan)
         {
-            
+            // Check if plan already exists
             var subscriptions = await _subscription.GetAllAsync();
             var existing = subscriptions.FirstOrDefault(p => p.Name == plan.Name);
 
             if (existing != null)
-                return null; 
+                return null;
 
+            // Create new plan entity
             var newPlan = new SubscriptionPlan
             {
                 Name = plan.Name,
                 Description = plan.Description,
                 Price = plan.Price,
-                DurationInDays = plan.DurationInDays,
-                CreatedOn = DateTime.UtcNow,
-               
+                DurationInDays = plan.DurationInDays
             };
 
-           _subscription.AddAsync(newPlan);
+            await _subscription.AddAsync(newPlan);
             await _subscription.SaveChangesAsync();
 
-            return newPlan;
+            // Map to response DTO
+            var response = new SubscriptionPlansResponseDto
+            {
+                Id = newPlan.Id,
+                Name = newPlan.Name,
+                Description = newPlan.Description,
+                Price = newPlan.Price,
+                DurationInDays = newPlan.DurationInDays
+            };
+
+            return response;
         }
+
 
 
         public async Task<bool> DeletePlanAsync(int id)

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using FitFlex.Application.DTO_s.Trainers_dto;
 using FitFlex.Application.DTO_s.User_dto;
@@ -8,6 +9,7 @@ using FitFlex.CommenAPi;
 using FitFlex.Domain.Entities.Trainer_model;
 using FitFlex.Domain.Entities.Users_Model;
 using FitFlex.Infrastructure.Migrations;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Mvc;
 using static System.Runtime.InteropServices.JavaScript.JSType;
@@ -123,12 +125,14 @@ namespace FitFlex.Controllers
             }
 
         }
-        [HttpDelete("deleteTrainer/{id}")]
+        [HttpDelete("deleteTrainer")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteTrainer(int id)
         {
             try
             {
-                var trainer = await _Trainerauth.DeleteTrainerAsync(id);
+                var currentUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+                var trainer = await _Trainerauth.DeleteTrainerAsync(id, currentUserId   );
 
                 if (trainer == null)
                     return NotFound(new APiResponds<string>("404", $"Trainer with Id {id} not found", null));

@@ -8,6 +8,7 @@ namespace FitFlex.Application.DTO_s
 {
     public class BaseEntity
     {
+        public bool IsDelete { get; set; } = false;
         public DateTime CreatedOn { get; set; } =DateTime.UtcNow;
         public int CreatedBy { get; set; }
 

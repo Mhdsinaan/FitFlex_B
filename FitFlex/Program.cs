@@ -13,6 +13,7 @@ using FitFlex.Application.DTO_s.Trainers_dto;
 using FitFlex.Infrastructure.Interfaces;
 using FitFlex.Application.services;
 using FitFlex.Middleware;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -39,6 +40,35 @@ builder.Services.AddAuthentication(options =>
         IssuerSigningKey = new SymmetricSecurityKey(key)
     };
 });
+// ✅ Swagger with JWT support
+builder.Services.AddSwaggerGen(opt =>
+{
+    opt.SwaggerDoc("v1", new OpenApiInfo { Title = "MyAPI", Version = "v1" });
+    opt.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        In = ParameterLocation.Header,
+        Description = "Please enter token",
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        BearerFormat = "JWT",
+        Scheme = "bearer"
+    });
+
+    opt.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type=ReferenceType.SecurityScheme,
+                    Id="Bearer"
+                }
+            },
+            new string[]{}
+        }
+    });
+});
 
 builder.Services.AddAuthorization();
 builder.Services.AddControllers();
@@ -55,6 +85,7 @@ builder.Services.AddValidatorsFromAssemblyContaining<TrainersValidation>();
 builder.Services.AddValidatorsFromAssemblyContaining<TrainerRegisterDtoValidation>();
 builder.Services.AddValidatorsFromAssemblyContaining<TrainerLoginDtoValidation>();
 
+builder.Services.AddHttpContextAccessor();
 
 
 
