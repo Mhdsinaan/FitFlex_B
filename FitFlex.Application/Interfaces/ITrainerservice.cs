@@ -15,5 +15,6 @@ namespace FitFlex.Application.Interfaces
         Task<TrainerResponseDto> GetTrainerByIdAsync(int trainerId);
         Task<bool> UpdateTrainerAsync(int trainerId, TrainerUpdateDto dto);
         Task<User?> DeleteTrainerAsync(int trainerId, int currentUserId);
+        Task<TrainerResponseDto?> AcceptTrainerAsync(int trainerId);
     }
 }

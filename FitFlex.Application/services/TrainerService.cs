@@ -8,6 +8,8 @@ using FitFlex.Application.Interfaces;
 using FitFlex.Domain.Entities.Trainer_model;
 using FitFlex.Domain.Entities.Users_Model;
 using FitFlex.Infrastructure.Interfaces;
+using FitFlex.Infrastructure.Migrations;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace FitFlex.Application.services
 {
@@ -19,6 +21,48 @@ namespace FitFlex.Application.services
         {
             _trainerRepo = trainerrepo;
             _UserRepo = UserRepo;
+        }
+
+
+        public async Task<TrainerResponseDto?> AcceptTrainerAsync(int trainerId)
+        {
+            var trainer = await _trainerRepo.GetByIdAsync(trainerId);
+            if (trainer == null || trainer.IsDelete) return null;
+
+      
+            if (trainer.Status == "Accepted")
+            {
+                return new TrainerResponseDto
+                {
+                    Id = trainer.Id,
+                    FullName = trainer.FullName,
+                    Email = trainer.Email,
+                    PhoneNumber = trainer.PhoneNumber,
+                    Gender = trainer.Gender,
+                    ExperienceYears = trainer.ExperienceYears,
+                    Status = "Already Accepted",
+                    CreatedOn = trainer.CreatedOn
+                };
+            }
+
+           
+            trainer.Status = "Accepted";
+            trainer.ModifiedOn = DateTime.UtcNow;
+
+            _trainerRepo.Update(trainer);
+            await _trainerRepo.SaveChangesAsync();
+
+            return new TrainerResponseDto
+            {
+                Id = trainer.Id,
+                FullName = trainer.FullName,
+                Email = trainer.Email,
+                PhoneNumber = trainer.PhoneNumber,
+                Gender = trainer.Gender,
+                ExperienceYears = trainer.ExperienceYears,
+                Status = trainer.Status,
+                CreatedOn = trainer.CreatedOn
+            };
         }
 
         public async Task<User?> DeleteTrainerAsync(int trainerId, int currentUserId)

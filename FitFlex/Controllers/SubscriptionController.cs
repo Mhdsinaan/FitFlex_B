@@ -24,7 +24,7 @@ namespace FitFlex.API.Controllers.Admin
         public async Task<IActionResult> GetAllPlans()
         {
             var plans = await _subscriptionService.GetAllPlansAsync();
-            return Ok(new APiResponds<IEnumerable<SubscriptionPlan>>("200", "Plans fetched successfully", plans));
+            return Ok(new APiResponds<IEnumerable<SubscriptionPlansResponseDto>>("200", "Plans fetched successfully", plans));
         }
 
        
@@ -50,16 +50,17 @@ namespace FitFlex.API.Controllers.Admin
 
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdatePlan(int id, [FromBody] SubscriptionPlan plan)
+        public async Task<IActionResult> UpdatePlan(int id, [FromBody] SubscriptionPlanDto planDto)
         {
-            var updatedPlan = await _subscriptionService.UpdatePlanAsync(id, plan);
+            var updatedPlan = await _subscriptionService.UpdatePlanAsync(id, planDto);
             if (updatedPlan == null)
                 return NotFound(new APiResponds<string>("404", "Plan not found", null));
 
-            return Ok(new APiResponds <SubscriptionPlan>("200", "Plan updated successfully", updatedPlan));
+            return Ok(new APiResponds<SubscriptionPlansResponseDto>("200", "Plan updated successfully", updatedPlan));
         }
 
-      
+
+
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeletePlan(int id)
         {

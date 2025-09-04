@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using FitFlex.Application.DTO_s.Trainers_dto;
 using FitFlex.Application.DTO_s.User_dto;
 using FitFlex.Application.Interfaces;
+using FitFlex.Application.services;
 using FitFlex.CommenAPi;
 using FitFlex.Domain.Entities.Trainer_model;
 using FitFlex.Domain.Entities.Users_Model;
@@ -147,6 +148,29 @@ namespace FitFlex.Controllers
                 return StatusCode(500, new APiResponds<string>("500", "Internal server error", ex.Message));
             }
         }
+        [HttpPut("accept/{trainerId}")]
+        public async Task<IActionResult> AcceptTrainer(int trainerId)
+        {
+            try
+            {
+                var result = await _Trainerauth.AcceptTrainerAsync(trainerId);
+
+                if (result == null)
+                    return NotFound(new APiResponds<string>("404", "Trainer not found", null));
+
+                if (result.Status == "Already Accepted")
+                    return Ok(new APiResponds<TrainerResponseDto>("200", "Trainer already accepted by Admin", result));
+
+                return Ok(new APiResponds<TrainerResponseDto>("200", "Trainer accepted successfully", result));
+            }
+            catch (Exception ex)
+            {
+                
+                return StatusCode(500, new APiResponds<string>("500", $"An error occurred: {ex.Message}", null));
+            }
+        }
+
+
 
 
 

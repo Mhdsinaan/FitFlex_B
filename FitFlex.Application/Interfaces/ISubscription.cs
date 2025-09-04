@@ -6,8 +6,8 @@ namespace FitFlex.Application.Interfaces
 {
     public interface ISubscription
     {
-       
-        Task<IEnumerable<SubscriptionPlan>> GetAllPlansAsync();
+
+        Task<IEnumerable<SubscriptionPlansResponseDto>> GetAllPlansAsync();
 
         Task<SubscriptionPlan?> GetPlanByIdAsync(int id);
 
@@ -16,7 +16,7 @@ namespace FitFlex.Application.Interfaces
 
 
 
-        Task<SubscriptionPlan?> UpdatePlanAsync(int id, SubscriptionPlan plan);
+        Task<SubscriptionPlansResponseDto?> UpdatePlanAsync(int id, SubscriptionPlanDto planDto);
 
 
         Task<bool> DeletePlanAsync(int id);

@@ -14,6 +14,8 @@ using FitFlex.Infrastructure.Interfaces;
 using FitFlex.Application.services;
 using FitFlex.Middleware;
 using Microsoft.OpenApi.Models;
+using FitFlex.Application.Mapper;
+using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -73,6 +75,7 @@ builder.Services.AddSwaggerGen(opt =>
 builder.Services.AddAuthorization();
 builder.Services.AddControllers();
 
+
 // Add DB context
 builder.Services.AddDbContext<MyContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("connection"))
@@ -98,6 +101,9 @@ builder.Services.AddScoped<ISubscription, SubscriptionService>();
 // Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddAutoMapper(typeof(MappingProfile));
+
 
 var app = builder.Build();
 

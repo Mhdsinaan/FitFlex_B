@@ -3,30 +3,35 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AutoMapper;
 using FitFlex.Application.DTO_s.subscriptionDto;
 using FitFlex.Application.Interfaces;
 using FitFlex.Domain.Entities.Subscription_model;
 using FitFlex.Infrastructure.Interfaces;
+using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 
 namespace FitFlex.Application.services
 {
     public class SubscriptionService : ISubscription
     {
         private readonly IRepository<SubscriptionPlan> _subscription;
-        public SubscriptionService(IRepository<SubscriptionPlan> subscription)
+        private readonly IMapper _mapper;
+
+        public SubscriptionService(IRepository<SubscriptionPlan> subscription, IMapper mapper)
         {
             _subscription = subscription;
+            _mapper = mapper;
         }
         public async Task<SubscriptionPlansResponseDto?> CreatePlanAsync(SubscriptionPlanDto plan)
         {
-            // Check if plan already exists
+          
             var subscriptions = await _subscription.GetAllAsync();
             var existing = subscriptions.FirstOrDefault(p => p.Name == plan.Name);
 
             if (existing != null)
                 return null;
 
-            // Create new plan entity
+            
             var newPlan = new SubscriptionPlan
             {
                 Name = plan.Name,
@@ -38,7 +43,7 @@ namespace FitFlex.Application.services
             await _subscription.AddAsync(newPlan);
             await _subscription.SaveChangesAsync();
 
-            // Map to response DTO
+          
             var response = new SubscriptionPlansResponseDto
             {
                 Id = newPlan.Id,
@@ -55,39 +60,52 @@ namespace FitFlex.Application.services
 
         public async Task<bool> DeletePlanAsync(int id)
         {
-            var plan = await _subscription.GetByIdAsync(id);
+            var plans= await _subscription.GetAllAsync();
+            var plan = plans.FirstOrDefault(p => p.Id == id && p.IsDelete == false);
+
             if (plan == null) return false;
 
-            _subscription.Delete(plan);
+            plan.IsDelete = true;
             await _subscription.SaveChangesAsync();
             return true;
         }
 
-        public async Task<IEnumerable<SubscriptionPlan>> GetAllPlansAsync()
+
+        public async Task<IEnumerable<SubscriptionPlansResponseDto>> GetAllPlansAsync()
         {
-            return await _subscription.GetAllAsync();
+            var plans = await _subscription.GetAllAsync();
+
+            if (plans == null )
+                return Enumerable.Empty<SubscriptionPlansResponseDto>();
+
+           
+            var planDtos = _mapper.Map<IEnumerable<SubscriptionPlansResponseDto>>(plans);
+            return planDtos;
         }
+
 
         public async Task<SubscriptionPlan?> GetPlanByIdAsync(int id)
         {
             return await _subscription.GetByIdAsync(id);
         }
-        public async Task<SubscriptionPlan?> UpdatePlanAsync(int id, SubscriptionPlan plan)
+        public async Task<SubscriptionPlansResponseDto?> UpdatePlanAsync(int id, SubscriptionPlanDto planDto)
         {
             var existing = await _subscription.GetByIdAsync(id);
             if (existing == null) return null;
 
-            existing.Name = plan.Name;
-            existing.Description = plan.Description;
-            existing.Price = plan.Price;
-            existing.DurationInDays = plan.DurationInDays;
+            existing.Name = planDto.Name;
+            existing.Description = planDto.Description;
+            existing.Price = planDto.Price;
+            existing.DurationInDays = planDto.DurationInDays;
             existing.ModifiedOn = DateTime.UtcNow;
 
             _subscription.Update(existing);
             await _subscription.SaveChangesAsync();
 
-            return existing;
+            return _mapper.Map<SubscriptionPlansResponseDto>(existing); 
         }
+
+
     }
 }
 
