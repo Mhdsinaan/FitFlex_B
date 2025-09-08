@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using FitFlex.Domain.Enum;
 
 namespace FitFlex.Application.DTO_s.Trainers_dto
 {
@@ -17,8 +18,9 @@ namespace FitFlex.Application.DTO_s.Trainers_dto
 
         // Optional
         public int ExperienceYears { get; set; }
-      
-        public string Status { get; set; }
-       
+        public TrainerStatus Status { get; set; }
+
+
+
     }
 }

@@ -4,17 +4,19 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using FitFlex.Application.DTO_s.Trainers_dto;
+using FitFlex.CommenAPi;
 using FitFlex.Domain.Entities.Trainer_model;
 using FitFlex.Domain.Entities.Users_Model;
+using FitFlex.Domain.Enum;
 
 namespace FitFlex.Application.Interfaces
 {
     public interface ITrainerservice
     {
-        Task<List<TrainerResponseDto>> GetAllTrainersAsync();
-        Task<TrainerResponseDto> GetTrainerByIdAsync(int trainerId);
-        Task<bool> UpdateTrainerAsync(int trainerId, TrainerUpdateDto dto);
-        Task<User?> DeleteTrainerAsync(int trainerId, int currentUserId);
-        Task<TrainerResponseDto?> AcceptTrainerAsync(int trainerId);
+        Task<APiResponds<List<TrainerResponseDto>>> GetAllTrainersAsync();
+        Task<APiResponds<TrainerResponseDto>> GetTrainerByIdAsync(int trainerId);
+        Task<APiResponds<bool>> UpdateTrainerAsync(int trainerId, TrainerUpdateDto dto);
+        Task<APiResponds<User?>> DeleteTrainerAsync(int trainerId, int currentUserId);
+        Task<APiResponds<TrainerResponseDto?>> UpdateTrainerStatusAsync(int trainerId, TrainerStatus newStatus);
     }
 }

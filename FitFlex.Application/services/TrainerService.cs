@@ -1,196 +1,170 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using FitFlex.Application.DTO_s.Trainers_dto;
 using FitFlex.Application.Interfaces;
+using FitFlex.CommenAPi;
 using FitFlex.Domain.Entities.Trainer_model;
 using FitFlex.Domain.Entities.Users_Model;
+using FitFlex.Domain.Enum;
 using FitFlex.Infrastructure.Interfaces;
-using FitFlex.Infrastructure.Migrations;
-using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace FitFlex.Application.services
 {
     public class TrainerService : ITrainerservice
     {
         private readonly IRepository<Trainer> _trainerRepo;
-        private readonly IRepository<User> _UserRepo;
-        public TrainerService(IRepository<Trainer> trainerrepo, IRepository<User> UserRepo)
+        private readonly IRepository<User> _userRepo;
+
+        public TrainerService(IRepository<Trainer> trainerRepo, IRepository<User> userRepo)
         {
-            _trainerRepo = trainerrepo;
-            _UserRepo = UserRepo;
+            _trainerRepo = trainerRepo;
+            _userRepo = userRepo;
         }
 
-
-        public async Task<TrainerResponseDto?> AcceptTrainerAsync(int trainerId)
-        {
-            var trainer = await _trainerRepo.GetByIdAsync(trainerId);
-            if (trainer == null || trainer.IsDelete) return null;
-
-      
-            if (trainer.Status == "Accepted")
+            public async Task<APiResponds<TrainerResponseDto?>> UpdateTrainerStatusAsync(int trainerId, TrainerStatus newStatus)
             {
-                return new TrainerResponseDto
+                try
                 {
-                    Id = trainer.Id,
-                    FullName = trainer.FullName,
-                    Email = trainer.Email,
-                    PhoneNumber = trainer.PhoneNumber,
-                    Gender = trainer.Gender,
-                    ExperienceYears = trainer.ExperienceYears,
-                    Status = "Already Accepted",
-                    CreatedOn = trainer.CreatedOn
-                };
-            }
-
-           
-            trainer.Status = "Accepted";
-            trainer.ModifiedOn = DateTime.UtcNow;
-
-            _trainerRepo.Update(trainer);
-            await _trainerRepo.SaveChangesAsync();
-
-            return new TrainerResponseDto
-            {
-                Id = trainer.Id,
-                FullName = trainer.FullName,
-                Email = trainer.Email,
-                PhoneNumber = trainer.PhoneNumber,
-                Gender = trainer.Gender,
-                ExperienceYears = trainer.ExperienceYears,
-                Status = trainer.Status,
-                CreatedOn = trainer.CreatedOn
-            };
-        }
-
-        public async Task<User?> DeleteTrainerAsync(int trainerId, int currentUserId)
-        {
-           
-            var trainer = await _trainerRepo.GetByIdAsync(trainerId);
-            if (trainer == null)
-            {
-              
-                return null;
-            }
-
-           
-            if (trainer.UserId == 0)
-            {
-               
-                return null;
-            }
-
-           
-            var user = await _UserRepo.GetByIdAsync(trainer.UserId);
-            if (user == null)
-            {
-               
-                return null;
-            }
-
-           
-            if (trainer.IsDelete == true)
-            {
-                return null;
-            }
-
-           
-            trainer.DeletedBy = currentUserId;
-            trainer.DeletedOn = DateTime.UtcNow;
-            trainer.IsDelete = true;
-            user.IsDelete = true;
-
-            _trainerRepo.Update(trainer);
-
-           
-            _UserRepo.Delete(user);
-
-          
-            await _trainerRepo.SaveChangesAsync();
-            await _UserRepo.SaveChangesAsync();
-
-            return user;
-        }
-
-
-
-
-
-
-
-
-        public async Task<List<TrainerResponseDto>> GetAllTrainersAsync()
-        {
-            var trainers = await _trainerRepo.GetAllAsync();
-
-            if (trainers == null || !trainers.Any())
-                return new List<TrainerResponseDto>();
-
-            var response = trainers.Select(t => new TrainerResponseDto
-            {
-                Id = t.Id,
-                FullName = t.FullName,
-                Email = t.Email,
-                PhoneNumber = t.PhoneNumber,
-                Gender = t.Gender,
-                ExperienceYears=t.ExperienceYears,
-
-              
-                CreatedOn = t.CreatedOn,
-                
-            }).ToList();
-
-            return response;
-        }
-
-
-
-        public async Task<TrainerResponseDto> GetTrainerByIdAsync(int trainerId)
-        {
-            var user = await _trainerRepo.GetByIdAsync(trainerId);
-            if (user is null) return null;
-            if (user.IsDelete == false)
-            {
-                return new TrainerResponseDto()
-            {
-                Id = user.Id,
-                Email = user.Email,
-                FullName = user.FullName,
-                Gender = user.Gender,
-                PhoneNumber = user.PhoneNumber,
-                ExperienceYears = user.ExperienceYears,
-                Status = user.Status
-                
-
-
-            };
-            }
-            return null;
-        }
-
-        public async Task<bool> UpdateTrainerAsync(int trainerId, TrainerUpdateDto dto)
-        {
-          
-            var trainer = await _trainerRepo.GetByIdAsync(trainerId);
-            if (trainer == null)
-            {
-                return false; 
-            }
+                    var trainer = await _trainerRepo.GetByIdAsync(trainerId);
+                    if (trainer == null || trainer.IsDelete)
+                        return new APiResponds<TrainerResponseDto?>("404", "Trainer not found", null);
 
             
-            trainer.FullName = dto.FullName;
-            trainer.PhoneNumber = dto.PhoneNumber;
-            trainer.Gender = dto.Gender;
-            trainer.ExperienceYears = dto.ExperienceYears;
 
-           
-             _trainerRepo.Update(trainer);
-            await _trainerRepo.SaveChangesAsync();
+               
+                    trainer.status = newStatus;
+                    trainer.ModifiedOn = DateTime.UtcNow;
 
-            return true;
+                    _trainerRepo.Update(trainer);
+                    await _trainerRepo.SaveChangesAsync();
+
+                    var dto = new TrainerResponseDto
+                    {
+                        Id = trainer.Id,
+                        FullName = trainer.FullName,
+                        Email = trainer.Email,
+                        PhoneNumber = trainer.PhoneNumber,
+                        Gender = trainer.Gender,
+                        ExperienceYears = trainer.ExperienceYears,
+                        Status = trainer.status,
+                        CreatedOn = trainer.CreatedOn
+                    };
+
+                    return new APiResponds<TrainerResponseDto?>("200", $"Trainer {newStatus} successfully", dto);
+                }
+                catch (Exception ex)
+                {
+                    return new APiResponds<TrainerResponseDto?>("500", ex.Message, null);
+                }
+            }
+
+        public async Task<APiResponds<User?>> DeleteTrainerAsync(int trainerId, int currentUserId)
+        {
+            try
+            {
+                var trainer = await _trainerRepo.GetByIdAsync(trainerId);
+                if (trainer == null || trainer.UserId == 0 || trainer.IsDelete)
+                    return new APiResponds<User?>("404", "Trainer not found or already deleted", null);
+
+                var user = await _userRepo.GetByIdAsync(trainer.UserId);
+                if (user == null)
+                    return new APiResponds<User?>("404", "Associated user not found", null);
+
+                trainer.DeletedBy = currentUserId;
+                trainer.DeletedOn = DateTime.UtcNow;
+                trainer.IsDelete = true;
+                user.IsDelete = true;
+
+                _trainerRepo.Update(trainer);
+                _userRepo.Update(user);
+
+                await _trainerRepo.SaveChangesAsync();
+                await _userRepo.SaveChangesAsync();
+
+                return new APiResponds<User?>("200", "Trainer deleted successfully", user);
+            }
+            catch (Exception ex)
+            {
+                return new APiResponds<User?>("500", ex.Message, null);
+            }
         }
 
+        public async Task<APiResponds<List<TrainerResponseDto>>> GetAllTrainersAsync()
+        {
+            try
+            {
+                var trainers = (await _trainerRepo.GetAllAsync()).Where(t => !t.IsDelete).ToList();
+
+                var dtoList = trainers.Select(t => new TrainerResponseDto
+                {
+                    Id = t.Id,
+                    FullName = t.FullName,
+                    Email = t.Email,
+                    PhoneNumber = t.PhoneNumber,
+                    Gender = t.Gender,
+                    ExperienceYears = t.ExperienceYears,
+                    CreatedOn = t.CreatedOn
+                }).ToList();
+
+                return new APiResponds<List<TrainerResponseDto>>("200", "Trainers fetched successfully", dtoList);
+            }
+            catch (Exception ex)
+            {
+                return new APiResponds<List<TrainerResponseDto>>("500", ex.Message, null);
+            }
+        }
+
+        public async Task<APiResponds<TrainerResponseDto>> GetTrainerByIdAsync(int trainerId)
+        {
+            try
+            {
+                var trainer = await _trainerRepo.GetByIdAsync(trainerId);
+                if (trainer == null || trainer.IsDelete)
+                    return new APiResponds<TrainerResponseDto>("404", "Trainer not found", null);
+
+                var dto = new TrainerResponseDto
+                {
+                    Id = trainer.Id,
+                    Email = trainer.Email,
+                    FullName = trainer.FullName,
+                    Gender = trainer.Gender,
+                    PhoneNumber = trainer.PhoneNumber,
+                    ExperienceYears = trainer.ExperienceYears,
+                  
+                };
+
+                return new APiResponds<TrainerResponseDto>("200", "Trainer fetched successfully", dto);
+            }
+            catch (Exception ex)
+            {
+                return new APiResponds<TrainerResponseDto>("500", ex.Message, null);
+            }
+        }
+
+        public async Task<APiResponds<bool>> UpdateTrainerAsync(int trainerId, TrainerUpdateDto dto)
+        {
+            try
+            {
+                var trainer = await _trainerRepo.GetByIdAsync(trainerId);
+                if (trainer == null)
+                    return new APiResponds<bool>("404", "Trainer not found", false);
+
+                trainer.FullName = dto.FullName;
+                trainer.PhoneNumber = dto.PhoneNumber;
+                trainer.Gender = dto.Gender;
+                trainer.ExperienceYears = dto.ExperienceYears;
+
+                _trainerRepo.Update(trainer);
+                await _trainerRepo.SaveChangesAsync();
+
+                return new APiResponds<bool>("200", "Trainer updated successfully", true);
+            }
+            catch (Exception ex)
+            {
+                return new APiResponds<bool>("500", ex.Message, false);
+            }
+        }
     }
 }

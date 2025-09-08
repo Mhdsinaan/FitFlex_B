@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using FitFlex.Application.DTO_s;
 using FitFlex.Domain.Entities.Users_Model;
+using FitFlex.Domain.Enum;
 
 namespace FitFlex.Domain.Entities.Trainer_model
 {
@@ -21,11 +22,10 @@ namespace FitFlex.Domain.Entities.Trainer_model
         public string Gender { get; set; }          
         public int ExperienceYears { get; set; }        
         public DateTime JoiningDate { get; set; }
-        public string Status { get; set; } = "Pending";
-        
-      
+       public TrainerStatus status { get; set; } = TrainerStatus.Pending;
 
-  
+
+
 
 
     }

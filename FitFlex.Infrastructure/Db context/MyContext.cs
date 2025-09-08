@@ -22,6 +22,7 @@ namespace FitFlex.Infrastructure.Db_context
         public DbSet<User> Users { get; set; }
         public DbSet<Trainer> Trainers { get; set; }
         public DbSet<SubscriptionPlan> SubscriptionPlans { get; set; }
+        public DbSet<UserSubscription> UserSubscriptions { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

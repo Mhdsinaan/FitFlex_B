@@ -51,10 +51,10 @@ namespace FitFlex.Application.DTOs.Dto_validation
             
 
 
-            RuleFor(t => t.Status)
-                .NotEmpty().WithMessage("Status is required")
-                .Must(s => s == "Active" || s == "Inactive")
-                .WithMessage("Status must be Active or Inactive");
+            //RuleFor(t => t.Status)
+            //    .NotEmpty().WithMessage("Status is required")
+            //    .Must(s => s == "Active" || s == "Inactive")
+            //    .WithMessage("Status must be Active or Inactive");
                 
         }
     }

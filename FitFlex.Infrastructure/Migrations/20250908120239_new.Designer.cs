@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FitFlex.Infrastructure.Migrations
 {
     [DbContext(typeof(MyContext))]
-    [Migration("20250903182552_new")]
+    [Migration("20250908120239_new")]
     partial class @new
     {
         /// <inheritdoc />
@@ -124,11 +124,10 @@ namespace FitFlex.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("status")
                         .HasColumnType("int");
 
                     b.HasKey("Id");

@@ -8,17 +8,10 @@ namespace FitFlex.Application.Interfaces
     {
 
         Task<IEnumerable<SubscriptionPlansResponseDto>> GetAllPlansAsync();
-
         Task<SubscriptionPlan?> GetPlanByIdAsync(int id);
-
-
         Task<SubscriptionPlansResponseDto> CreatePlanAsync(SubscriptionPlanDto plan);
-
-
-
         Task<SubscriptionPlansResponseDto?> UpdatePlanAsync(int id, SubscriptionPlanDto planDto);
-
-
         Task<bool> DeletePlanAsync(int id);
+        Task<>
     }
 }
