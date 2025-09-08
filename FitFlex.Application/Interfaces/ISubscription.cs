@@ -12,6 +12,8 @@ namespace FitFlex.Application.Interfaces
         Task<SubscriptionPlansResponseDto> CreatePlanAsync(SubscriptionPlanDto plan);
         Task<SubscriptionPlansResponseDto?> UpdatePlanAsync(int id, SubscriptionPlanDto planDto);
         Task<bool> DeletePlanAsync(int id);
-        Task<>
+        
     }
+
+
 }
